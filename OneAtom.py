@@ -94,7 +94,7 @@ axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1], axs_md[0][2], axs
 
 # Format plot
 for ax, ax_label, y_data in zip(axs, all_cb_vector_labels, all_y_data):
-    ax.plot(times, y_data)
+    ax.plot(times*1e15, y_data)
 
     ax.set_ylim(-0.1, 1.1)
     ax.set_title(rf"$|{ax_label}\rangle$")
@@ -107,9 +107,9 @@ for ax, ax_label, y_data in zip(axs, all_cb_vector_labels, all_y_data):
 
 fig.suptitle("Time Evolution of Different State Probabilities")
 fig.supylabel("Probability")
-fig.supxlabel("Time (s)")
+fig.supxlabel(r"Time ($fs$)")
 
-# Display Hamiltonian on plot
+# Display Hamiltonian and other params on plot
 mpl.rcParams['text.usetex'] = True
 
 latex_matrix = (
@@ -119,11 +119,16 @@ latex_matrix = (
     r"\end{array} \right)$"
 )
 
+latex_E_0 = (rf"$E_0 = {E_0/1.6e-19}eV$")
+latex_E_1 = (rf"$E_1 = {E_1/1.6e-19}eV$")
+
 axs_md[0, 3].axis('off')
 axs_md[1, 3].axis('off')
 
 axs_md[0, 3].text(0.5, 0.85, latex_matrix, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
-axs_md[0, 3].set_title("Hamiltonian")
+axs_md[0, 3].text(0.5, 0.6, latex_E_0, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
+axs_md[0, 3].text(0.5, 0.45, latex_E_1, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
+axs_md[0, 3].set_title("Parameters")
 
 plt.show()
 
