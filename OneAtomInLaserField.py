@@ -1,11 +1,11 @@
-# +-----------------------------------------------------------------------------------+
-# |                                                                                   |
-# |  Now evolving |ψ(t=0)> = |+> according to the hamiltonian of an atom in L field:  |
-# |                                                                                   |
-# |  H = (     ∆       Ωe^(-iϕ_L) ) * hbar / 2                                       |
-# |      ( Ωe^(iϕ_L)       -∆     )                                                  |
-# |                                                                                   |
-# +-----------------------------------------------------------------------------------+
+# +---------------------------------------------------------------------------------------+
+# |                                                                                       |
+# |  Now evolving |ψ(t=0)> = |+> according to the hamiltonian of an atom in laser field:  |
+# |                                                                                       |
+# |  H = (     ∆       Ωe^(-iϕ_L) ) * hbar / 2                                            |
+# |      ( Ωe^(iϕ_L)       -∆     )                                                       |
+# |                                                                                       |
+# +---------------------------------------------------------------------------------------+
 
 import numpy as np
 from numpy import linalg
@@ -56,14 +56,14 @@ plus_i_cb   = np.array([ 1 + 0j ,  0 + 1j ]) / np.sqrt(2)
 minus_i_cb  = np.array([ 1 + 0j ,  0 - 1j ]) / np.sqrt(2)
 
 # Inputs
-psi_0 = zero_cb # |ψ(t=0)> = |+>
+psi_0 = plus_i_cb # |ψ(t=0)> = |+>
 hbar = constants.hbar
 E_0 = -13.6 * 1.6e-19
 E_1 =  -3.4 * 1.6e-19
 
-detuning = 0
-rabi_frequency = 2*np.pi *1e6
-phi_L = 0
+detuning = 1e5
+rabi_frequency = 1e6
+phi_L = np.pi
 
 # Explicitly calculate Hamiltonian
 H = np.zeros((2, 2), dtype=complex)
@@ -76,7 +76,7 @@ H[1][0] = rabi_frequency * complex_exp(   phi_L )
 H *= hbar / 2
 
 # Set up plotting vars
-times = np.linspace(0, 2e-6, 300)
+times = np.linspace(0, 5e-5, 300)
 
 # Group all cb vectors so they are iterable
 all_cb_vector_labels = ["0", "1", "+", "-", "+i", "-i"]
@@ -125,21 +125,23 @@ fig.supxlabel(r"Time ($s$)")
 mpl.rcParams['text.usetex'] = True
 
 latex_matrix = (
-    r"$\displaystyle H = \left( \begin{array}{cc}"
-    r"E_0 & 0 \\"
-    r"0 & E_1"
+    r"$\displaystyle H = \frac{\hbar}{2} \left( \begin{array}{cc}"
+    r"\Delta & \Omega e^{-i \phi_L} \\"
+    r"\Omega e^{i \phi_L} & - \Delta"
     r"\end{array} \right)$"
 )
 
-latex_E_0 = (rf"$E_0 = {E_0/1.6e-19}eV$")
-latex_E_1 = (rf"$E_1 = {E_1/1.6e-19}eV$")
+latex_phi_L = (rf"$\phi_L = {round(phi_L*100)/100}\ rad$")
+latex_detuning = (rf"$\Delta = {detuning / 1e6}\times10^6\ rad\ s^{{-1}}$")
+latex_rabi_freq = (rf"$\Omega = {rabi_frequency / 1e6}\times10^6\ rad\ s^{{-1}}$")
 
 axs_md[0, 3].axis('off')
 axs_md[1, 3].axis('off')
 
 axs_md[0, 3].text(0.5, 0.85, latex_matrix, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
-axs_md[0, 3].text(0.5, 0.6, latex_E_0, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
-axs_md[0, 3].text(0.5, 0.45, latex_E_1, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
+axs_md[0, 3].text(0.5, 0.6, latex_phi_L, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
+axs_md[0, 3].text(0.5, 0.45, latex_detuning, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
+axs_md[0, 3].text(0.5, 0.3, latex_rabi_freq, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
 axs_md[0, 3].set_title("Parameters")
 
 plt.show()
