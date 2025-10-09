@@ -1,17 +1,22 @@
-# Most basic simulation, evolving |ψ(t=0)> = |0> according to the hamiltonian:
-#
-# H = ( 0 γ )
-#     ( γ 0 )
-#
+# +---------------------------------------------------------------------------------+
+# |                                                                                 |
+# |  Most basic simulation, evolving |ψ(t=0)> = |0> according to the hamiltonian:   |
+# |                                                                                 |
+# |  H = ( 0 γ )                                                                    |
+# |      ( γ 0 )                                                                    |
+# |                                                                                 |
+# +---------------------------------------------------------------------------------+
 
 import numpy as np
 from numpy import linalg
 import matplotlib.pyplot as plt
 
+# Calculate wavefunction at time (t) given Hamiltonian (H) and initial wavefunction psi_0
 def solve_schrodinger(H, psi_0, t):
     # Calculate eigenvalues and eigenvectors
     eigenvalues, eigenvectors = linalg.eig(H)
-    eigenvectors = np.array([eigenvectors[:,i] for i in range(len(eigenvectors))])
+    eigenvectors = np.array([eigenvectors[:,i] for i in range(len(eigenvectors))]) 
+    # ^ This could be brought outside function to avoid repeat calculations if function is called multiple times
 
     # Rotation matrix is formed from a matrix of eigenvectors
     rotation_matrix = eigenvectors.copy()
@@ -32,8 +37,12 @@ def solve_schrodinger(H, psi_0, t):
 
     return psi_t
 
+# Computational basis vectors
+zero_cbv = np.array([1+0j, 0+0j])
+one_cbv = np.array([0+0j, 1+0j])
+
 # Inputs
-psi_0 = np.array([1, 0]) # |ψ(t=0)> = |0>
+psi_0 = zero_cbv # |ψ(t=0)> = |0>
 gamma = 1
 hbar = 1
 
@@ -41,10 +50,6 @@ hbar = 1
 H = np.zeros((2, 2))
 H[0][1] = gamma
 H[1][0] = gamma
-
-# Computational basis vectors
-zero = np.array([1+0j, 0+0j])
-one = np.array([0+0j, 1+0j])
 
 # Set up plotting vars
 times = np.linspace(0, 5, 300)
@@ -56,8 +61,8 @@ for time in times:
     answer = solve_schrodinger(H, psi_0, time)
     
     # Calculate the probability of being in both computational basis states
-    lower_vals.append(abs(np.dot(zero, answer))**2)
-    higher_vals.append(abs(np.dot(one, answer))**2)
+    lower_vals.append(abs(np.dot(zero_cbv, answer))**2)
+    higher_vals.append(abs(np.dot(one_cbv, answer))**2)
 
 # Plot probabilities of wavefunction being in states |0> and |1> as a function of time
 fig, ax = plt.subplots()
