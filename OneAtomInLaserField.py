@@ -2,8 +2,8 @@
 # |                                                                                   |
 # |  Now evolving |ψ(t=0)> = |+> according to the hamiltonian of an atom in L field:  |
 # |                                                                                   |
-# |  H = ( E_0  0  )                                                                  |
-# |      (  0  E_1 )                                                                  |
+# |  H = (     ∆       Ωe^(-iϕ_L) ) * hbar / 2                                       |
+# |      ( Ωe^(iϕ_L)       -∆     )                                                  |
 # |                                                                                   |
 # +-----------------------------------------------------------------------------------+
 
@@ -42,6 +42,9 @@ def solve_schrodinger(H, psi_0, t):
 def calc_probability(wavefunction_value, measurement_vector):
     return abs(np.dot(measurement_vector, wavefunction_value))**2
 
+def complex_exp(power):
+    return np.cos(power) + 1j * np.sin(power)
+
 # Common state vectors in computational basis
 zero_cb     = np.array([ 1 + 0j ,  0 + 0j ])
 one_cb      = np.array([ 0 + 0j ,  1 + 0j ])
@@ -53,40 +56,49 @@ plus_i_cb   = np.array([ 1 + 0j ,  0 + 1j ]) / np.sqrt(2)
 minus_i_cb  = np.array([ 1 + 0j ,  0 - 1j ]) / np.sqrt(2)
 
 # Inputs
-psi_0 = plus_cb # |ψ(t=0)> = |+>
+psi_0 = zero_cb # |ψ(t=0)> = |+>
 hbar = constants.hbar
 E_0 = -13.6 * 1.6e-19
 E_1 =  -3.4 * 1.6e-19
 
+detuning = 0
+rabi_frequency = 2*np.pi *1e6
+phi_L = 0
+
 # Explicitly calculate Hamiltonian
-H = np.zeros((2, 2))
-H[0][0] = E_0
-H[1][1] = E_1
+H = np.zeros((2, 2), dtype=complex)
+H[0][0] =   detuning
+H[1][1] = - detuning
+
+H[0][1] = rabi_frequency * complex_exp( - phi_L )
+H[1][0] = rabi_frequency * complex_exp(   phi_L )
+
+H *= hbar / 2
 
 # Set up plotting vars
-times = np.linspace(0, 1e-15, 300)
-
-zero_cb_vals     = []
-one_cb_vals      = []
-
-plus_cb_vals     = []
-minus_cv_vals    = []
-
-plus_i_cb_vals   = []
-minus_i_cb_vals  = []
+times = np.linspace(0, 2e-6, 300)
 
 # Group all cb vectors so they are iterable
 all_cb_vector_labels = ["0", "1", "+", "-", "+i", "-i"]
 all_cb_vectors = [zero_cb, one_cb, plus_cb, minus_cv, plus_i_cb, minus_i_cb]
-all_y_data = [zero_cb_vals, one_cb_vals, plus_cb_vals, minus_cv_vals, plus_i_cb_vals, minus_i_cb_vals]
+all_y_data = [[], [], [], [], [], []]
 
 for time in times:
     # Calculate the wavefunction at different times
     answer = solve_schrodinger(H, psi_0, time)
     
+    answer[0] *= complex_exp(   detuning * time / 2)
+    answer[1] *= complex_exp( - detuning * time / 2)
+
     # Calculate the probability of being in different states
     for cb_vector, y_data in zip(all_cb_vectors, all_y_data):
         y_data.append(calc_probability(cb_vector, answer))
+
+
+
+# ************************** PLOTTING **************************
+
+
 
 # Create subplot axes
 fig, axs_md = plt.subplots(2, 4, sharex=True, sharey=True)
@@ -107,9 +119,9 @@ for ax, ax_label, y_data in zip(axs, all_cb_vector_labels, all_y_data):
 
 fig.suptitle("Time Evolution of Different State Probabilities")
 fig.supylabel("Probability")
-fig.supxlabel("Time (s)")
+fig.supxlabel(r"Time ($s$)")
 
-# Display Hamiltonian on plot
+# Display Hamiltonian and other params on plot
 mpl.rcParams['text.usetex'] = True
 
 latex_matrix = (
@@ -119,11 +131,15 @@ latex_matrix = (
     r"\end{array} \right)$"
 )
 
+latex_E_0 = (rf"$E_0 = {E_0/1.6e-19}eV$")
+latex_E_1 = (rf"$E_1 = {E_1/1.6e-19}eV$")
+
 axs_md[0, 3].axis('off')
 axs_md[1, 3].axis('off')
 
 axs_md[0, 3].text(0.5, 0.85, latex_matrix, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
-axs_md[0, 3].set_title("Hamiltonian")
+axs_md[0, 3].text(0.5, 0.6, latex_E_0, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
+axs_md[0, 3].text(0.5, 0.45, latex_E_1, fontsize=12, ha='center', va='center', transform=axs_md[0, 3].transAxes)
+axs_md[0, 3].set_title("Parameters")
 
 plt.show()
-

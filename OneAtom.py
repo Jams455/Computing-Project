@@ -131,6 +131,3 @@ axs_md[0, 3].text(0.5, 0.45, latex_E_1, fontsize=12, ha='center', va='center', t
 axs_md[0, 3].set_title("Parameters")
 
 plt.show()
-
-
-plt.show()
