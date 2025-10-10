@@ -1,11 +1,13 @@
-# +---------------------------------------------------------------------------------------+
-# |                                                                                       |
-# |  Now evolving |ψ(t=0)> according to the hamiltonian of an atom in laser field: m      |
-# |                                                                                       |
-# |  H = (     ∆       Ωe^(-iϕ_L) ) * hbar / 2                                            |
-# |      ( Ωe^(iϕ_L)       -∆     )                                                       |
-# |                                                                                       |
-# +---------------------------------------------------------------------------------------+
+# +-----------------------------------------------------------------------+
+# |                                                                       |
+# |  Now evolving two atoms in laser field according to the hamiltonian:  |
+# |                                                                       |
+# |  H =      (    2∆      Ωe^(-iϕ_L)  Ωe^(-iϕ_L)       0     )      |
+# |      hbar ( Ωe^(iϕ_L)      0           0       Ωe^(-iϕ_L) )                |
+# |        2  ( Ωe^(iϕ_L)      0           0       Ωe^(-iϕ_L) )                |
+# |           (    0       Ωe^(iϕ_L)   Ωe^(iϕ_L)       -2∆    )                |
+# |                                                                       |
+# +-----------------------------------------------------------------------+
 
 import numpy as np
 from numpy import linalg
@@ -61,7 +63,7 @@ hbar = constants.hbar
 E_0 = -13.6 * 1.6e-19
 E_1 =  -3.4 * 1.6e-19
 
-detuning = 1e6
+detuning = 1e0
 rabi_frequency = 1e6
 phi_L = np.pi
 
