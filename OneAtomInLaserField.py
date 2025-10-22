@@ -7,52 +7,14 @@
 # |                                                                                       |
 # +---------------------------------------------------------------------------------------+
 
-import numpy as np
-from numpy import linalg
 import matplotlib.pyplot as plt
 from scipy import constants
 import matplotlib as mpl
-
-# Calculate wavefunction at time (t) given Hamiltonian (H) and initial wavefunction psi_0
-def solve_schrodinger(H, psi_0, t):
-    # Calculate eigenvalues and eigenvectors
-    eigenvalues, eigenvectors = linalg.eigh(H)
-    # ^ This could be brought outside function to avoid repeat calculations if function is called multiple times
-
-    # Rotation matrix is formed from a matrix of eigenvectors
-    rotation_matrix = eigenvectors.copy()
-
-    # Convert psi_0 into the eigenbasis of H
-    rotation_matrix_dagger = rotation_matrix.conj().T  # First compute conjugate transpose of rotation matrix
-    psi_0_eigen = np.dot(rotation_matrix_dagger, psi_0)
-
-    # Calculate the evolution operator in the eigenbasis of the Hamiltonian
-    diagonal_terms = np.exp( - 1j * eigenvalues * t / constants.hbar )
-    evolution_matrix = np.diag(diagonal_terms)
-
-    # Evolve psi_0_eigen
-    psi_t_eigen = np.dot(evolution_matrix, psi_0_eigen)
-
-    # Transform back into computational basis
-    psi_t = np.dot(rotation_matrix, psi_t_eigen)
-
-    return psi_t
-
-def calc_probability(wavefunction_value, measurement_vector):
-    return abs(np.vdot(measurement_vector, wavefunction_value))**2
-
-# Common state vectors in computational basis
-zero_cb     = np.array([ 1 + 0j ,  0 + 0j ])
-one_cb      = np.array([ 0 + 0j ,  1 + 0j ])
-
-plus_cb     = np.array([ 1 + 0j ,  1 + 0j ]) / np.sqrt(2)
-minus_cv    = np.array([ 1 + 0j , -1 + 0j ]) / np.sqrt(2)
-
-plus_i_cb   = np.array([ 1 + 0j ,  0 + 1j ]) / np.sqrt(2)
-minus_i_cb  = np.array([ 1 + 0j ,  0 - 1j ]) / np.sqrt(2)
+import numpy as np
+import helper
 
 # Inputs
-psi_0 = zero_cb # |ψ(t=0)> = |0>
+psi_0 = helper.zero_cb # |ψ(t=0)> = |0>
 hbar = constants.hbar
 
 detuning = 0 * np.pi * 1e6
@@ -74,18 +36,18 @@ times = np.linspace(0, 1e-6, 300)
 
 # Group all cb vectors so they are iterable
 all_cb_vector_labels = ["0", "1", "+", "-", "+i", "-i"]
-all_cb_vectors = [zero_cb, one_cb, plus_cb, minus_cv, plus_i_cb, minus_i_cb]
+all_cb_vectors = [helper.zero_cb, helper.one_cb, helper.plus_cb, helper.minus_cv, helper.plus_i_cb, helper.minus_i_cb]
 all_y_data = [[], [], [], [], [], []]
 
 for time in times:
     # Calculate the wavefunction at different times
-    answer = solve_schrodinger(H, psi_0, time)
+    answer = helper.solve_schrodinger(H, psi_0, time)
 
     assert np.isclose(np.vdot(answer, answer), 1.0)
 
     # Calculate the probability of being in different states
     for cb_vector, y_data in zip(all_cb_vectors, all_y_data):
-        y_data.append(calc_probability(cb_vector, answer))
+        y_data.append(helper.calc_probability(cb_vector, answer))
 
 
 

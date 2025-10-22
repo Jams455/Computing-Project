@@ -7,11 +7,10 @@
 # |                                                                                 |
 # +---------------------------------------------------------------------------------+
 
-import numpy as np
-from numpy import linalg
 import matplotlib.pyplot as plt
 from scipy import constants
 import matplotlib as mpl
+import numpy as np
 import helper
 
 # Inputs
