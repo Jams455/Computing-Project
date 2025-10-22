@@ -1,9 +1,9 @@
 # +---------------------------------------------------------------------------------------+
 # |                                                                                       |
-# |  Now evolving |ψ(t=0)> according to the hamiltonian of an atom in laser field: m      |
+# |  Now evolving |ψ(t=0)> according to the hamiltonian of an atom in laser field:        |
 # |                                                                                       |
-# |  H = (     ∆       Ωe^(-iϕ_L) ) * hbar / 2                                            |
-# |      ( Ωe^(iϕ_L)       -∆     )                                                       |
+# |  H = hbar (     ∆       Ωe^(-iϕ_L) )                                                  |
+# |      / 2  ( Ωe^(iϕ_L)       -∆     )                                                  |
 # |                                                                                       |
 # +---------------------------------------------------------------------------------------+
 
@@ -27,7 +27,7 @@ def solve_schrodinger(H, psi_0, t):
     psi_0_eigen = np.dot(rotation_matrix_dagger, psi_0)
 
     # Calculate the evolution operator in the eigenbasis of the Hamiltonian
-    diagonal_terms = np.exp( - 1j * eigenvalues * t / hbar )
+    diagonal_terms = np.exp( - 1j * eigenvalues * t / constants.hbar )
     evolution_matrix = np.diag(diagonal_terms)
 
     # Evolve psi_0_eigen
@@ -55,9 +55,9 @@ minus_i_cb  = np.array([ 1 + 0j ,  0 - 1j ]) / np.sqrt(2)
 psi_0 = zero_cb # |ψ(t=0)> = |0>
 hbar = constants.hbar
 
-detuning = 1 * np.pi * 1e6
+detuning = 0 * np.pi * 1e6
 rabi_frequency = 2 * np.pi * 1e6
-phi_L = np.pi / 3
+phi_L = np.pi / 3*0
 
 # Explicitly calculate Hamiltonian
 H = np.zeros((2, 2), dtype=complex)
