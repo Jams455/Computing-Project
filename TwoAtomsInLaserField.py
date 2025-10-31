@@ -30,38 +30,38 @@ phi_L *= 2 * np.pi
 V = 1
 V *= 2 * np.pi * 1e8
 
-# Calculate Hamiltonian
-H1 = np.zeros((2, 2), dtype=complex)
+# Calculate 2x2 Hamiltonian
+H_2 = np.zeros((2, 2), dtype=complex)
 
-H1[0][0] =   detuning
-H1[1][1] = - detuning
+H_2[0][0] =   detuning
+H_2[1][1] = - detuning
 
-H1[0][1] = rabi_frequency * np.exp( - 1j * phi_L )
-H1[1][0] = rabi_frequency * np.exp(   1j *  phi_L )
+H_2[0][1] = rabi_frequency * np.exp( - 1j * phi_L )
+H_2[1][0] = rabi_frequency * np.exp(   1j *  phi_L )
 
-H1 *= constants.hbar / 2
+H_2 *= constants.hbar / 2
 
-H2 = np.kron(H1, np.diag((1, 1))) + np.kron(np.diag((1, 1)), H1)
+# Calculate 4x4 Hamiltonian
 
-H2[3][3] += 2 * V
-
-# Set up plotting vars
-times = np.linspace(0, 1e-6, 300)
+H_4 = np.kron(H_2, np.diag((1, 1))) + np.kron(np.diag((1, 1)), H_2)
+H_4[3][3] += 2 * V
 
 # Group all cb vectors so they are iterable
 all_cb_vector_labels = ["00", "01", "10", "11", "++"]
 all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_zero_cb, helper.one_one_cb, helper.bell_plus_cb]
 all_y_data = [[], [], [], [], []]
 
-for time in times:
-    # Calculate the wavefunction at different times
-    answer = helper.solve_schrodinger(H2, psi_0, time)
+# Calculate the wavefunction at different times
+times = np.linspace(0, 1e-6, 300)
+psi_ts = helper.solve_schrodinger_time_independent(H_4, psi_0, times)
 
-    assert np.isclose(np.vdot(answer, answer), 1.0)
+for psi_t in psi_ts:
+    # Check each wavefunction is normalised
+    assert np.isclose(np.vdot(psi_t, psi_t), 1.0)
 
     # Calculate the probability of being in different states
     for cb_vector, y_data in zip(all_cb_vectors, all_y_data):
-        y_data.append(helper.calc_probability(cb_vector, answer))
+        y_data.append(helper.calc_probability(cb_vector, psi_t))
 
 
 

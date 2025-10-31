@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from scipy import constants
 
 
-# Calculate wavefunction at time (t) given Hamiltonian (H) and initial wavefunction psi_0
-def solve_schrodinger(H, psi_0, t):
+# Calculate wavefunction at times [t_0, t_1, ..., t_n] given Hamiltonian (H) and initial wavefunction psi_0
+def solve_schrodinger_time_independent(H, psi_0, t):
     # Calculate eigenvalues and eigenvectors
     eigenvalues, eigenvectors = linalg.eigh(H)
     # ^ This could be brought outside function to avoid repeat calculations if function is called multiple times
@@ -17,17 +17,23 @@ def solve_schrodinger(H, psi_0, t):
     rotation_matrix_dagger = rotation_matrix.conj().T  # First compute conjugate transpose of rotation matrix
     psi_0_eigen = np.dot(rotation_matrix_dagger, psi_0)
 
+    psi_ts = []
+
     # Calculate the evolution operator in the eigenbasis of the Hamiltonian
-    diagonal_terms = np.exp( - 1j * eigenvalues * t / constants.hbar )
-    evolution_matrix = np.diag(diagonal_terms)
+    for time in t:
+        diagonal_terms = np.exp( - 1j * eigenvalues * time / constants.hbar )
+        evolution_matrix = np.diag(diagonal_terms)
 
-    # Evolve psi_0_eigen
-    psi_t_eigen = np.dot(evolution_matrix, psi_0_eigen)
+        # Evolve psi_0_eigen
+        psi_t_eigen = np.dot(evolution_matrix, psi_0_eigen)
 
-    # Transform back into computational basis
-    psi_t = np.dot(rotation_matrix, psi_t_eigen)
+        # Transform back into computational basis
+        psi_t = np.dot(rotation_matrix, psi_t_eigen)
 
-    return psi_t
+        # Add to psi_ts list
+        psi_ts.append(psi_t)
+
+    return psi_ts
 
 def calc_probability(wavefunction_value, measurement_vector):
     return abs(np.vdot(measurement_vector, wavefunction_value))**2

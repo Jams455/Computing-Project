@@ -24,39 +24,32 @@ H = np.zeros((2, 2))
 H[0][0] = E_0
 H[1][1] = E_1
 
-# Set up plotting vars
-times = np.linspace(0, 1e-15, 300)
-
-zero_cb_vals     = []
-one_cb_vals      = []
-
-plus_cb_vals     = []
-minus_cv_vals    = []
-
-plus_i_cb_vals   = []
-minus_i_cb_vals  = []
-
 # Group all cb vectors so they are iterable
 all_cb_vector_labels = ["0", "1", "+", "-", "+i", "-i"]
 all_cb_vectors = [helper.zero_cb, helper.one_cb, helper.plus_cb, helper.minus_cv, helper.plus_i_cb, helper.minus_i_cb]
-all_y_data = [zero_cb_vals, one_cb_vals, plus_cb_vals, minus_cv_vals, plus_i_cb_vals, minus_i_cb_vals]
+all_y_data = [[], [], [], [], [], []]
 
-for time in times:
-    # Calculate the wavefunction at different times
-    answer = helper.solve_schrodinger(H, psi_0, time)
-    
+# Calculate the wavefunction at different times
+times = np.linspace(0, 1e-15, 300)
+psi_ts = helper.solve_schrodinger_time_independent(H, psi_0, times)
+
+for psi_t in psi_ts:
+    # Check each wavefunction is normalised
+    assert np.isclose(np.vdot(psi_t, psi_t), 1.0)
+
     # Calculate the probability of being in different states
     for cb_vector, y_data in zip(all_cb_vectors, all_y_data):
-        y_data.append(helper.calc_probability(cb_vector, answer))
-
-# Create subplot axes
-fig, axs_md = plt.subplots(2, 4, sharex=True, sharey=True)
-axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1], axs_md[0][2], axs_md[1][2]]
+        y_data.append(helper.calc_probability(cb_vector, psi_t))
 
 
 
 # ************************** PLOTTING **************************
 
+
+
+# Create subplot axes
+fig, axs_md = plt.subplots(2, 4, sharex=True, sharey=True)
+axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1], axs_md[0][2], axs_md[1][2]]
 
 
 # Format plot
