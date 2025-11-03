@@ -18,10 +18,7 @@ import helper
 # Inputs
 psi_0 = helper.zero_zero_cb # |ψ(t=0)>
 
-detuning = 0
-detuning *= 2 * np.pi * 1e6
-
-rabi_frequency = 1
+rabi_frequency = 2
 rabi_frequency *= 2 * np.pi * 1e6
 
 phi_L = 0.0
@@ -32,20 +29,6 @@ Vs *= 1e6
 
 display_params = True
 
-# Calculate 2x2 Hamiltonian
-H_2 = np.zeros((2, 2), dtype=complex)
-
-H_2[0][0] =   detuning
-H_2[1][1] = - detuning
-
-H_2[0][1] = rabi_frequency * np.exp( - 1j * phi_L )
-H_2[1][0] = rabi_frequency * np.exp(   1j * phi_L )
-
-H_2 *= constants.hbar / 2
-
-# Calculate 4x4 Hamiltonians with different V values
-H_4 = np.kron(H_2, np.diag((1, 1))) + np.kron(np.diag((1, 1)), H_2)
-
 # Group all cb vectors so they are iterable
 all_cb_vector_labels = ["00", "01", "10", "11", "++"]
 all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_zero_cb, helper.one_one_cb, helper.bell_plus_cb]
@@ -55,13 +38,11 @@ fig, axs_md = plt.subplots(2, 3, sharex=True, sharey=True)
 axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1], axs_md[0][2]]
 
 for V in Vs:
-    H_4V = H_4.copy() + (np.diag([0, 0, 0, 2 * V]) * constants.hbar / 2)
-
     all_y_data = [[], [], [], [], []]
 
     # Calculate the wavefunction at different times
     times = np.linspace(0, 1e-6, 300)
-    psi_ts = helper.solve_schrodinger_time_independent(H_4V, psi_0, times)
+    psi_ts = helper.solve_schrodinger_time_dependent(rabi_frequency, phi_L, V, psi_0, 0, 1e-6, 100)
 
     for psi_t in psi_ts:
         # Check each wavefunction is normalised
@@ -109,7 +90,7 @@ if display_params:
     )
 
     latex_phi_L = (rf"$\phi_L = {round(phi_L/np.pi*100)/100}\pi\ rad$")
-    latex_detuning = (rf"$\Delta = {detuning /np.pi / 1e6}\pi\times10^6\ rad\ s^{{-1}}$")
+    latex_detuning = (rf"$\Delta = {np.pi /np.pi / 1e6}\pi\times10^6\ rad\ s^{{-1}}$")
     latex_rabi_freq = (rf"$\Omega = {rabi_frequency / np.pi  / 1e6}\pi\times10^6\ rad\ s^{{-1}}$")
 
     axs_md[1, 2].text(0.5, 0.8, latex_matrix, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
