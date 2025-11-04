@@ -120,6 +120,6 @@ if display_params:
 
 axs_md[1, 2].axis('off')
 
-plt.savefig("Time Independent", dpi=600)
+#plt.savefig("Time Independent", dpi=600)
 
 plt.show()
