@@ -31,8 +31,8 @@ display_params = True
 
 t_0 = 0
 t_max = 1e-6
-n_steps = 300
-times = np.linspace(0, 1e-6, 300)
+n_steps = 5000
+times = np.linspace(t_0, t_max, n_steps)
 detuning_t = helper.detuning_t_func(times)
 
 # Group all cb vectors so they are iterable
