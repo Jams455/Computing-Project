@@ -123,6 +123,6 @@ if display_params:
 
 axs_md[1, 2].axis('off')
 
-plt.savefig("Time Independent - 2 pi MHz detuning", dpi=600)
+#plt.savefig("Time Independent - 2 pi MHz detuning", dpi=600)
 
 plt.show()
