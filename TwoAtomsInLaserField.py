@@ -47,17 +47,17 @@ H_2 *= constants.hbar / 2
 H_4 = np.kron(H_2, np.diag((1, 1))) + np.kron(np.diag((1, 1)), H_2)
 
 # Group all cb vectors so they are iterable
-all_cb_vector_labels = ["00", "01", "10", "11", "++"]
-all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_zero_cb, helper.one_one_cb, helper.bell_plus_cb]
+all_cb_vector_labels = ["00", "01", "10", "11"]
+all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_zero_cb, helper.one_one_cb]
 
 # Create subplot axes
 fig, axs_md = plt.subplots(2, 3, sharex=True, sharey=True, figsize = (14, 8))
-axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1], axs_md[0][2]]
+axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1]]
 
 for V in Vs:
     H_4V = H_4.copy() + (np.diag([0, 0, 0, 2 * V]) * constants.hbar / 2)
 
-    all_y_data = [[], [], [], [], []]
+    all_y_data = [[], [], [], []]
 
     # Calculate the wavefunction at different times
     times = np.linspace(0, 1e-6, 300)
@@ -90,6 +90,10 @@ for V in Vs:
 
         ax.minorticks_on()
         ax.tick_params(which="minor", direction="in", top=True, right=True)
+    
+    total_prob = np.array(all_y_data[0]) + np.array(all_y_data[1]) + np.array(all_y_data[2]) + np.array(all_y_data[3])
+
+    axs_md[0][2].plot(times, total_prob, color='blue' if V==0 else 'red', alpha=1 if V==0 else 0.3, linewidth=1 if V==0 else 0.6)
 
 fig.suptitle("Time Evolution of Different State Probabilities")
 fig.supylabel("Probability of State")

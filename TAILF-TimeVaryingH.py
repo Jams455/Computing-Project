@@ -31,13 +31,13 @@ display_params = True
 
 t_0 = 0
 t_max = 1e-6
-n_steps = 5000
+n_steps = 300
 times = np.linspace(t_0, t_max, n_steps)
 detuning_t = helper.detuning_t_func(times)
 
 # Group all cb vectors so they are iterable
-all_cb_vector_labels = ["00", "01", "11", "++"]
-all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_one_cb, helper.bell_plus_cb]
+all_cb_vector_labels = ["00", "01", "10", "11"]
+all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_zero_cb, helper.one_one_cb]
 
 # Create subplot axes
 fig, axs_md = plt.subplots(2, 3, sharex=True, figsize = (14, 8))
@@ -80,8 +80,15 @@ for V in Vs:
         ax.minorticks_on()
         ax.tick_params(which="minor", direction="in", top=True, right=True)
 
-axs_md[0][2].set_ylabel("Detuning (Hz)")
-axs_md[0][2].plot(times, detuning_t)
+    total_prob = np.array(all_y_data[0]) + np.array(all_y_data[1]) + np.array(all_y_data[2]) + np.array(all_y_data[3])
+
+    total_prob = np.round(total_prob, 5)
+    
+    axs_md[0][2].plot(times, total_prob, color='blue' if V==0 else 'red', alpha=1 if V==0 else 0.3, linewidth=1 if V==0 else 0.6)
+
+
+#axs_md[0][2].set_ylabel("Detuning (Hz)")
+#axs_md[0][2].plot(times, detuning_t)
 
 fig.suptitle("Time Evolution of Different State Probabilities")
 fig.supylabel("Probability of State")
