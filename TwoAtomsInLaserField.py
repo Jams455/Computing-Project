@@ -111,15 +111,18 @@ if display_params:
     latex_phi_L = (rf"$\phi_L = {round(phi_L/np.pi*100)/100}\pi\ rad$")
     latex_detuning = (rf"$\Delta = {detuning /np.pi / 1e6}\pi\times10^6\ rad\ s^{{-1}}$")
     latex_rabi_freq = (rf"$\Omega = {rabi_frequency / np.pi  / 1e6}\pi\times10^6\ rad\ s^{{-1}}$")
+    latex_V = (rf"$( 0 \le V \le 100 ) \cdot 2\pi\ \textrm{{MHz}} $")
 
     axs_md[1, 2].text(0.5, 0.8, latex_matrix, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
     axs_md[1, 2].text(0.5, 0.55, latex_phi_L, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
     axs_md[1, 2].text(0.5, 0.4, latex_detuning, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
     axs_md[1, 2].text(0.5, 0.25, latex_rabi_freq, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
+    axs_md[1, 2].text(0.5, 0.1, latex_V, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
+    
     axs_md[1, 2].set_title("Parameters")
 
 axs_md[1, 2].axis('off')
 
-#plt.savefig("Time Independent", dpi=600)
+plt.savefig("Time Independent - 2 pi MHz detuning", dpi=600)
 
 plt.show()
