@@ -18,7 +18,7 @@ import helper
 # Inputs
 psi_0 = helper.zero_zero_cb # |ψ(t=0)>
 
-detuning = 1
+detuning = 0
 detuning *= 2 * np.pi * 1e6
 
 rabi_frequency = 1
@@ -51,7 +51,7 @@ all_cb_vector_labels = ["00", "01", "10", "11", "++"]
 all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_zero_cb, helper.one_one_cb, helper.bell_plus_cb]
 
 # Create subplot axes
-fig, axs_md = plt.subplots(2, 3, sharex=True, sharey=True)
+fig, axs_md = plt.subplots(2, 3, sharex=True, sharey=True, figsize = (14, 8))
 axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1], axs_md[0][2]]
 
 for V in Vs:
@@ -119,5 +119,7 @@ if display_params:
     axs_md[1, 2].set_title("Parameters")
 
 axs_md[1, 2].axis('off')
+
+plt.savefig("Time Independent", dpi=600)
 
 plt.show()
