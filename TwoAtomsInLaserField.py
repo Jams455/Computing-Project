@@ -18,7 +18,7 @@ import helper
 # Inputs
 psi_0 = helper.zero_zero_cb # |ψ(t=0)>
 
-detuning = 1
+detuning = 0
 detuning *= 2 * np.pi * 1e6
 
 rabi_frequency = 1
@@ -27,7 +27,7 @@ rabi_frequency *= 1e6 * 2 * np.pi
 phi_L = 0.0
 phi_L *= 2 * np.pi
 
-Vs = np.linspace(0, 0, 1)
+Vs = np.linspace(0, 100, 100)
 Vs *= 1e6
 
 display_params = True
