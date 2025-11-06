@@ -59,7 +59,7 @@ def Hamiltonian_T(rabi_freq, phi_L, V, t):
     # Calculate 4x4 Hamiltonians with different V values
     H_4 = np.kron(H_2, np.diag((1, 1))) + np.kron(np.diag((1, 1)), H_2)
 
-    H_4 += + np.diag([0, 0, 0, 2 * V]) * constants.hbar / 2
+    H_4 += + np.diag([0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j, (2.0 + 0.0j) * V]) * constants.hbar / 2
 
     return H_4
 

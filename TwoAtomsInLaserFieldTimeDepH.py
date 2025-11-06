@@ -19,19 +19,19 @@ import helper
 psi_0 = helper.zero_zero_cb # |ψ(t=0)>
 
 rabi_frequency = 1
-rabi_frequency *= 2 * np.pi * 1e6
+rabi_frequency *= 2 * np.pi * 1e6 # rad s-1
 
-phi_L = 0.0
+phi_L = 0
 phi_L *= 2 * np.pi
 
-Vs = np.linspace(0, 100, 100)
-Vs *= 1e6
+Vs = np.linspace(0, 100, 100, dtype=complex)
+Vs *= 1e6 * np.pi * 2
 
 display_params = True
 
 t_0 = 0
 t_max = 1e-6
-n_steps = 5000
+n_steps = 500
 times = np.linspace(t_0, t_max, n_steps)
 detuning_t = helper.detuning_t_func(times)
 

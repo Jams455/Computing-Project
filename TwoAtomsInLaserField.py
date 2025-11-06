@@ -18,16 +18,16 @@ import helper
 # Inputs
 psi_0 = helper.zero_zero_cb # |ψ(t=0)>
 
-detuning = 0
+detuning = 1
 detuning *= 2 * np.pi * 1e6
 
 rabi_frequency = 1
-rabi_frequency *= 2 * np.pi * 1e6
+rabi_frequency *= 1e6 * 2 * np.pi
 
 phi_L = 0.0
 phi_L *= 2 * np.pi
 
-Vs = np.linspace(0, 100, 100)
+Vs = np.linspace(0, 0, 1)
 Vs *= 1e6
 
 display_params = True
@@ -38,8 +38,8 @@ H_2 = np.zeros((2, 2), dtype=complex)
 H_2[0][0] =   detuning
 H_2[1][1] = - detuning
 
-H_2[0][1] = rabi_frequency * np.exp( - 1j * phi_L )
-H_2[1][0] = rabi_frequency * np.exp(   1j * phi_L )
+H_2[0][1] = rabi_frequency #* np.exp( - 1j * phi_L )
+H_2[1][0] = rabi_frequency #* np.exp(   1j * phi_L )
 
 H_2 *= constants.hbar / 2
 

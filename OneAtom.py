@@ -15,12 +15,11 @@ import helper
 
 # Inputs
 psi_0 = helper.plus_cb # |ψ(t=0)> = |+>
-hbar = constants.hbar
 E_0 = -13.6 * 1.6e-19
 E_1 =  -3.4 * 1.6e-19
 
 # Explicitly calculate Hamiltonian
-H = np.zeros((2, 2))
+H = np.zeros((2, 2), dtype=complex)
 H[0][0] = E_0
 H[1][1] = E_1
 
