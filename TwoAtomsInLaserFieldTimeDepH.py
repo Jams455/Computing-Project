@@ -25,7 +25,7 @@ phi_L = 0
 phi_L *= 2 * np.pi
 
 Vs = np.linspace(0, 100, 100, dtype=complex)
-Vs *= 1e6 * np.pi * 2
+Vs *= 1e6*2*np.pi
 
 display_params = True
 

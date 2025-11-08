@@ -54,7 +54,9 @@ all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_zero_cb, h
 fig, axs_md = plt.subplots(2, 3, sharex=True, sharey=True, figsize = (14, 8))
 axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1], axs_md[0][2]]
 
-for V in Vs:
+cmap = plt.get_cmap('plasma', len(Vs))
+
+for i, V in enumerate(Vs):
     H_4V = H_4.copy() + (np.diag([0, 0, 0, 2 * V]) * constants.hbar / 2)
 
     all_y_data = [[], [], [], [], []]
@@ -80,7 +82,7 @@ for V in Vs:
     # Format plot
     for ax, ax_label, y_data in zip(axs, all_cb_vector_labels, all_y_data):
 
-        ax.plot(times, y_data, color='blue' if V==0 else 'red', alpha=1 if V==0 else 0.3, linewidth=1 if V==0 else 0.6)
+        ax.plot(times, y_data, color='blue' if V==0 else cmap(i*4), alpha=1 if V==0 else 1, linewidth=1 if V==0 else 0.6)
 
         ax.set_ylim(-0.1, 1.1)
         ax.set_title(rf"$|{ax_label}\rangle$")

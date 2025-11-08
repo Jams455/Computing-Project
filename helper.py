@@ -116,4 +116,4 @@ zero_one_cb = np.kron(zero_cb, one_cb)
 one_zero_cb = np.kron(one_cb, zero_cb)
 one_one_cb = np.kron(one_cb, one_cb)
 
-bell_plus_cb = np.array([ 0 + 0j , 1 + 0j ,  1 + 0j , 0 + 0j ]) / np.sqrt(2)
+bell_plus_cb = np.array([ 0 + 0j , 1 + 0j ,  -1 + 0j , 0 + 0j ]) / np.sqrt(2)
