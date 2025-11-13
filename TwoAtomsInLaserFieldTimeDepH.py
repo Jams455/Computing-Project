@@ -32,15 +32,6 @@ t_max = 1e-6
 n_steps = 500
 times = np.linspace(t_0, t_max, n_steps)
 
-# Create subplot axes
-fig, axs = plt.subplots(3, 2, sharex=True, figsize = (14, 8))
-
-((lin_det_ax, cub_det_ax), (lin_scatt_ax, cub_scatt_ax), (lin_cmap_ax, cub_cmap_ax)) = axs
-
-lin_det_ax.sharey(cub_det_ax)
-lin_cmap_ax.sharey(cub_cmap_ax)
-lin_scatt_ax.sharey(cub_scatt_ax)
-
 # Create data containers
 lin_detuning_t = helper.detuning_t_linear(times)
 cub_detuning_t = helper.detuning_t_cubic(times)
@@ -71,6 +62,16 @@ for V in Vs:
 # ************************** PLOTTING **************************
 
 
+# Create subplot axes
+fig, axs = plt.subplots(3, 2, sharex=True, figsize = (14, 8))
+
+((lin_det_ax, cub_det_ax), (lin_scatt_ax, cub_scatt_ax), (lin_cmap_ax, cub_cmap_ax)) = axs
+
+lin_det_ax.sharey(cub_det_ax)
+lin_cmap_ax.sharey(cub_cmap_ax)
+lin_scatt_ax.sharey(cub_scatt_ax)
+
+
 # Convert units for plotting
 
 times *= 1e6    # Convert to micro seconds
@@ -92,6 +93,7 @@ cub_scatt_ax.minorticks_on()
 lin_scatt_ax.tick_params(which="minor", direction="in", top=True, right=True)
 cub_scatt_ax.tick_params(which="minor", direction="in", top=True, right=True)
 
+lin_scatt_ax.set_ylabel(rf"$|\Psi^+\rangle$ Probability")
 
 # Format detuning plots
 lin_det_ax.tick_params(direction="in", top=True, right=True)
@@ -102,6 +104,8 @@ cub_det_ax.minorticks_on()
 
 lin_det_ax.tick_params(which="minor", direction="in", top=True, right=True)
 cub_det_ax.tick_params(which="minor", direction="in", top=True, right=True)
+
+lin_det_ax.set_ylabel(r"Detuning $\Omega / 2\pi$ (MHz)")
 
 
 # Plot detunings
