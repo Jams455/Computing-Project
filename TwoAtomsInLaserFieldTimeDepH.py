@@ -24,94 +24,107 @@ rabi_frequency *= 2 * np.pi * 1e6 # rad s-1
 phi_L = 0
 phi_L *= 2 * np.pi
 
-Vs = np.linspace(0, 100, 100, dtype=complex)
+Vs = np.linspace(100, 0, 100, dtype=complex)
 Vs *= 1e6*2*np.pi
-
-display_params = True
 
 t_0 = 0
 t_max = 1e-6
 n_steps = 500
 times = np.linspace(t_0, t_max, n_steps)
-detuning_t = helper.detuning_t_func(times)
-
-# Group all cb vectors so they are iterable
-all_cb_vector_labels = ["00", "01", "11", "++"]
-all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_one_cb, helper.bell_plus_cb]
 
 # Create subplot axes
-fig, axs_md = plt.subplots(2, 3, sharex=True, figsize = (14, 8))
-axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1]]
+fig, axs = plt.subplots(3, 2, sharex=True, figsize = (14, 8))
 
-for ax in axs:
-    ax.sharey(axs[0])
+((lin_det_ax, cub_det_ax), (lin_scatt_ax, cub_scatt_ax), (lin_cmap_ax, cub_cmap_ax)) = axs
+
+lin_det_ax.sharey(cub_det_ax)
+lin_cmap_ax.sharey(cub_cmap_ax)
+lin_scatt_ax.sharey(cub_scatt_ax)
+
+# Create data containers
+lin_detuning_t = helper.detuning_t_linear(times)
+cub_detuning_t = helper.detuning_t_cubic(times)
+
+lin_bell_plus_probs_t = [] # [V_ind][t_ind]
+cub_bell_plus_probs_t = [] # [V_ind][t_ind]
+
 
 for V in Vs:
-    all_y_data = [[], [], [], []]
+    lin_bell_plus_probs_t.append([])
+    cub_bell_plus_probs_t.append([])
 
     # Calculate the wavefunction at different times
-    psi_ts = helper.solve_schrodinger_time_dependent(rabi_frequency, phi_L, V, psi_0, t_0, t_max, n_steps)
+    lin_det_psi_ts = helper.solve_schrodinger_time_dependent(rabi_frequency, phi_L, V, helper.detuning_t_linear, psi_0, t_0, t_max, n_steps)
+    cub_det_psi_ts = helper.solve_schrodinger_time_dependent(rabi_frequency, phi_L, V, helper.detuning_t_cubic, psi_0, t_0, t_max, n_steps)
 
-    for psi_t in psi_ts:
+    for lin_det_psi_t, cub_det_psi_t in zip(lin_det_psi_ts, cub_det_psi_ts):
         # Check each wavefunction is normalised
-        assert np.isclose(helper.calc_probability(psi_t, psi_t), 1.0)
+        assert np.isclose(helper.calc_probability(lin_det_psi_t, lin_det_psi_t), 1.0)
+        assert np.isclose(helper.calc_probability(cub_det_psi_t, cub_det_psi_t), 1.0)
 
-        # Calculate the probability of being in different states at time t
-        for cb_vector, y_data in zip(all_cb_vectors, all_y_data):
-            y_data.append(helper.calc_probability(cb_vector, psi_t))
+        # Calculate the probability of being in the bell+ state
+        lin_bell_plus_probs_t[-1].append(helper.calc_probability(helper.bell_plus_cb, lin_det_psi_t))
+        cub_bell_plus_probs_t[-1].append(helper.calc_probability(helper.bell_plus_cb, cub_det_psi_t))
 
 
 
 # ************************** PLOTTING **************************
 
 
+# Convert units for plotting
 
-    # Format plot
-    for ax, ax_label, y_data in zip(axs, all_cb_vector_labels, all_y_data):
-        
-        ax.plot(times, y_data, color='blue' if V==0 else 'red', alpha=1 if V==0 else 0.3, linewidth=1 if V==0 else 0.6)
+times *= 1e6    # Convert to micro seconds
+Vs *= 1e-6 / (2*np.pi)      # Convert to MHz
 
-        ax.set_ylim(-0.1, 1.1)
-        ax.set_title(rf"$|{ax_label}\rangle$")
+# Format line plots
+lin_scatt_ax.set_ylim(-0.1, 1.1)
+cub_scatt_ax.set_ylim(-0.1, 1.1)
 
-        ax.set_yticks([0, 0.5, 1])
-        ax.tick_params(direction="in", top=True, right=True, labelsize='small')
+lin_scatt_ax.set_yticks([0, 0.5, 1])
+cub_scatt_ax.set_yticks([0, 0.5, 1])
 
-        ax.minorticks_on()
-        ax.tick_params(which="minor", direction="in", top=True, right=True)
+lin_scatt_ax.tick_params(direction="in", top=True, right=True)   #, labelsize='small')
+cub_scatt_ax.tick_params(direction="in", top=True, right=True)   #, labelsize='small')
 
-axs_md[0][2].set_ylabel("Detuning (Hz)")
-axs_md[0][2].plot(times, detuning_t)
+lin_scatt_ax.minorticks_on()
+cub_scatt_ax.minorticks_on()
 
-fig.suptitle("Time Evolution of Different State Probabilities")
-fig.supylabel("Probability of State")
-fig.supxlabel(r"Time ($s$)")
+lin_scatt_ax.tick_params(which="minor", direction="in", top=True, right=True)
+cub_scatt_ax.tick_params(which="minor", direction="in", top=True, right=True)
 
-if display_params:
-    # Display Hamiltonian and other params on plot
-    mpl.rcParams['text.usetex'] = True
 
-    latex_matrix = (
-        r"$\displaystyle H = \frac{\hbar}{2} \left( \begin{array}{cccc}"
-        r"2 \Delta & \Omega e^{-i \phi_L} & \Omega e^{-i \phi_L} & 0 \\"
-        r"\Omega e^{i \phi_L} & 0 & 0 & \Omega e^{-i \phi_L} \\"
-        r"\Omega e^{i \phi_L} & 0 & 0 & \Omega e^{-i \phi_L} \\"
-        r"0 & \Omega e^{i \phi_L} & \Omega e^{i \phi_L} & - 2 \Delta + 2V \\"
-        r"\end{array} \right)$"
-    )
+# Format detuning plots
+lin_det_ax.tick_params(direction="in", top=True, right=True)
+cub_det_ax.tick_params(direction="in", top=True, right=True)
 
-    latex_phi_L = (rf"$\phi_L = {round(phi_L/np.pi*100)/100}\pi\ \textrm{{rad}}$")
-    latex_V = (rf"$( 0 \le V \le 100 ) \cdot 2\pi\ \textrm{{MHz}} $")
-    latex_rabi_freq = (rf"$\Omega = {rabi_frequency / np.pi  / 1e6}\pi\times10^6\ \textrm{{rad}}\ \textrm{{s}}^{{-1}}$")
+lin_det_ax.minorticks_on()
+cub_det_ax.minorticks_on()
 
-    axs_md[1, 2].text(0.5, 0.8, latex_matrix, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
-    axs_md[1, 2].text(0.5, 0.55, latex_phi_L, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
-    axs_md[1, 2].text(0.5, 0.4, latex_V, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
-    axs_md[1, 2].text(0.5, 0.25, latex_rabi_freq, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
-    axs_md[1, 2].set_title("Parameters")
+lin_det_ax.tick_params(which="minor", direction="in", top=True, right=True)
+cub_det_ax.tick_params(which="minor", direction="in", top=True, right=True)
 
-axs_md[1, 2].axis('off')
+
+# Plot detunings
+lin_det_ax.plot(times, lin_detuning_t, color='blue' if V==0 else 'red', alpha=1 if V==0 else 0.3, linewidth=1 if V==0 else 0.6)
+cub_det_ax.plot(times, cub_detuning_t, color='blue' if V==0 else 'red', alpha=1 if V==0 else 0.3, linewidth=1 if V==0 else 0.6)
+
+
+# Plot line plots
+for lin_bell_plus_prob_t, cub_bell_plus_prob_t in zip(lin_bell_plus_probs_t, cub_bell_plus_probs_t):
+    lin_scatt_ax.plot(times, lin_bell_plus_prob_t, color='red', alpha = 0.3, linewidth = 1)
+    cub_scatt_ax.plot(times, cub_bell_plus_prob_t, color='red', alpha = 0.3, linewidth = 1)
+
+
+# Plot colourmap plots
+lin_cmap_ax.imshow(lin_bell_plus_probs_t, cmap='coolwarm', interpolation='nearest', aspect='auto',
+                    extent=[np.real(times.min()), np.real(times.max()), np.real(Vs.min()), np.real(Vs.max())])
+
+cub_cmap_ax.imshow(cub_bell_plus_probs_t, cmap='coolwarm', interpolation='nearest', aspect='auto',
+                    extent=[np.real(times.min()), np.real(times.max()), np.real(Vs.min()), np.real(Vs.max())])
+
+
+
+# Save plot and display
 
 #plt.savefig("Time Dependent", dpi=600)
-
 plt.show()

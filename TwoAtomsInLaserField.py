@@ -15,6 +15,10 @@ import matplotlib as mpl
 import numpy as np
 import helper
 
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
+from matplotlib.ticker import ScalarFormatter
+
 # Inputs
 psi_0 = helper.zero_zero_cb # |ψ(t=0)>
 
@@ -47,14 +51,14 @@ H_2 *= constants.hbar / 2
 H_4 = np.kron(H_2, np.diag((1, 1))) + np.kron(np.diag((1, 1)), H_2)
 
 # Group all cb vectors so they are iterable
-all_cb_vector_labels = ["00", "01", "10", "11", "++"]
-all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_zero_cb, helper.one_one_cb, helper.bell_plus_cb]
+all_cb_vector_labels = [rf"$|00\rangle$", rf"$|01\rangle$", rf"$|11\rangle$", rf"$|\Psi^+\rangle$"]
+all_cb_vectors = [helper.zero_zero_cb, helper.zero_one_cb, helper.one_one_cb, helper.bell_plus_cb]
 
 # Create subplot axes
-fig, axs_md = plt.subplots(2, 3, sharex=True, sharey=True, figsize = (14, 8))
-axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1], axs_md[0][2]]
+fig, axs_md = plt.subplots(2, 2, sharex=True, sharey=True, figsize = (12, 8))
+axs = [axs_md[0][0], axs_md[1][0], axs_md[0][1], axs_md[1][1]]
 
-cmap = plt.get_cmap('plasma', len(Vs))
+cmap = plt.get_cmap('coolwarm', len(Vs))
 
 for i, V in enumerate(Vs):
     H_4V = H_4.copy() + (np.diag([0, 0, 0, 2 * V]) * constants.hbar / 2)
@@ -82,10 +86,10 @@ for i, V in enumerate(Vs):
     # Format plot
     for ax, ax_label, y_data in zip(axs, all_cb_vector_labels, all_y_data):
 
-        ax.plot(times, y_data, color='blue' if V==0 else cmap(i*4), alpha=1 if V==0 else 1, linewidth=1 if V==0 else 0.6)
+        ax.plot(times*1e6, y_data, color='blue' if V==0 else cmap(i*4), alpha=1 if V==0 else 1, linewidth=1 if V==0 else 0.6)
 
         ax.set_ylim(-0.1, 1.1)
-        ax.set_title(rf"$|{ax_label}\rangle$")
+        ax.set_title(ax_label)
 
         ax.set_yticks([0, 0.5, 1])
         ax.tick_params(direction="in", top=True, right=True, labelsize='small')
@@ -93,38 +97,19 @@ for i, V in enumerate(Vs):
         ax.minorticks_on()
         ax.tick_params(which="minor", direction="in", top=True, right=True)
 
-fig.suptitle("Time Evolution of Different State Probabilities")
+
 fig.supylabel("Probability of State")
-fig.supxlabel(r"Time ($s$)")
+fig.supxlabel(r"Time ($\mu s$)")
+plt.subplots_adjust(left=0.062, right=0.9, top=0.9, bottom=0.08, wspace=0.05, hspace=0.15)
 
-if display_params:
-    # Display Hamiltonian and other params on plot
-    mpl.rcParams['text.usetex'] = True
+# Normalization for V values
+norm = Normalize(vmin=Vs.min()*1e-6, vmax=Vs.max()*1e-6)
+sm = ScalarMappable(cmap=cmap, norm=norm)
+sm.set_array([])  # required for colorbar
 
-    latex_matrix = (
-        r"$\displaystyle H = \frac{\hbar}{2} \left( \begin{array}{cccc}"
-        r"2 \Delta & \Omega e^{-i \phi_L} & \Omega e^{-i \phi_L} & 0 \\"
-        r"\Omega e^{i \phi_L} & 0 & 0 & \Omega e^{-i \phi_L} \\"
-        r"\Omega e^{i \phi_L} & 0 & 0 & \Omega e^{-i \phi_L} \\"
-        r"0 & \Omega e^{i \phi_L} & \Omega e^{i \phi_L} & - 2 \Delta + 2V \\"
-        r"\end{array} \right)$"
-    )
+# Add vertical colorbar to the right of all subplots
+fig.colorbar(sm, ax=axs, orientation='vertical', fraction=0.05, pad=0.04, label=r"$V\ (\mathrm{MHz})$")
 
-    latex_phi_L = (rf"$\phi_L = {round(phi_L/np.pi*100)/100}\pi\ rad$")
-    latex_detuning = (rf"$\Delta = {detuning /np.pi / 1e6}\pi\times10^6\ rad\ s^{{-1}}$")
-    latex_rabi_freq = (rf"$\Omega = {rabi_frequency / np.pi  / 1e6}\pi\times10^6\ rad\ s^{{-1}}$")
-    latex_V = (rf"$( 0 \le V \le 100 ) \cdot 2\pi\ \textrm{{MHz}} $")
-
-    axs_md[1, 2].text(0.5, 0.8, latex_matrix, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
-    axs_md[1, 2].text(0.5, 0.55, latex_phi_L, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
-    axs_md[1, 2].text(0.5, 0.4, latex_detuning, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
-    axs_md[1, 2].text(0.5, 0.25, latex_rabi_freq, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
-    axs_md[1, 2].text(0.5, 0.1, latex_V, fontsize=12, ha='center', va='center', transform=axs_md[1, 2].transAxes)
-    
-    axs_md[1, 2].set_title("Parameters")
-
-axs_md[1, 2].axis('off')
-
-#plt.savefig("Time Independent - 2 pi MHz detuning", dpi=600)
+plt.savefig("Time Independent", dpi=600)
 
 plt.show()

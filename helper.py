@@ -37,14 +37,19 @@ def solve_schrodinger_time_independent(H, psi_0, t):
 def calc_probability(wavefunction_value, measurement_vector):
     return abs(np.vdot(measurement_vector, wavefunction_value))**2
 
-def detuning_t_func(t):
+def detuning_t_cubic(t):
     Detuning_max = 2 * np.pi * 50 * 1e6 # Hz
     t_max = 1e-6 # s
-    return 8 * Detuning_max * ( (t - t_max/2) / t_max )**3 
+    return 8 * Detuning_max * ( (t - t_max/2) / t_max )**3
     #return 0 * t
 
+def detuning_t_linear(t):
+    Detuning_max = 2 * np.pi * 50 * 1e6 # Hz
+    t_max = 1e-6 # s
+    return - Detuning_max + 2 * Detuning_max * t / t_max
+
 # Calculate Hamiltonians at time T for different values of V
-def Hamiltonian_T(rabi_freq, phi_L, V, t):
+def Hamiltonian_T(rabi_freq, phi_L, V, detuning_t_func, t):
     # Calculate 2x2 Hamiltonian
     H_2 = np.zeros((2, 2), dtype=complex)
 
@@ -64,7 +69,7 @@ def Hamiltonian_T(rabi_freq, phi_L, V, t):
     return H_4
 
 # Calculate wavefunction at times [t_0, t_1, ..., t_n] given Hamiltonian ( H = H(t) ) and initial wavefunction psi_0
-def solve_schrodinger_time_dependent(rabi_freq, phi_L, V, psi_0, t_0, t_max, n_steps):
+def solve_schrodinger_time_dependent(rabi_freq, phi_L, V, detuning_func, psi_0, t_0, t_max, n_steps):
     psi_t = psi_0
     psi_ts = []
 
@@ -75,7 +80,7 @@ def solve_schrodinger_time_dependent(rabi_freq, phi_L, V, psi_0, t_0, t_max, n_s
         psi_ts.append(psi_t)
 
         # Calculate Hamiltonian
-        H = Hamiltonian_T(rabi_freq, phi_L, V, time)
+        H = Hamiltonian_T(rabi_freq, phi_L, V, detuning_func, time)
 
         # Calculate eigenvalues and eigenvectors
         eigenvalues, eigenvectors = linalg.eigh(H)
@@ -116,4 +121,4 @@ zero_one_cb = np.kron(zero_cb, one_cb)
 one_zero_cb = np.kron(one_cb, zero_cb)
 one_one_cb = np.kron(one_cb, one_cb)
 
-bell_plus_cb = np.array([ 0 + 0j , 1 + 0j ,  -1 + 0j , 0 + 0j ]) / np.sqrt(2)
+bell_plus_cb = np.array([ 0 + 0j , 1 + 0j ,  1 + 0j , 0 + 0j ]) / np.sqrt(2)
