@@ -75,6 +75,7 @@ print(cub_bell_plus_probs_t[cub_i, cub_j], f" --->> V={Vs[cub_i]/(2e6*np.pi)} & 
 # ************************** PLOTTING **************************
 
 
+# Set plot params
 fontsize = 16
 cmap='cividis'
 
@@ -94,7 +95,7 @@ cub_scatt_ax.label_outer()
 # Convert units for plotting
 
 times *= 1e6                        # Convert to micro seconds
-#Vs *= 1e-6 / (2*np.pi)              # Convert to MHz
+Vs *= 1e-6 / (2*np.pi)              # Convert to MHz
 cub_detuning_t /= 1e6 * 2 * np.pi   # Convert to M rad s-1
 lin_detuning_t /= 1e6 * 2 * np.pi   # Convert to M rad s-1
 
